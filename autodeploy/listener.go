@@ -7,6 +7,12 @@ import (
 	"os/exec"
 )
 
+// Serve start listening for registerd listeners
+func Serve(addr string) {
+	fmt.Printf("Serving and Listening on %s", addr)
+	http.ListenAndServe(addr, nil)
+}
+
 // RegisterListeners makes endpoints for given listeners
 func RegisterListeners(endPointToScriptPath map[string]string) {
 	for endPoint, scriptPath := range endPointToScriptPath {
