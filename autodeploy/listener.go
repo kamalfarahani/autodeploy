@@ -1,6 +1,7 @@
 package autodeploy
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"os"
@@ -27,19 +28,22 @@ func RegisterListeners(endPointToScriptPath map[string]string) {
 
 func makeListener(scriptPath string) func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, req *http.Request) {
-		err := executeFile(scriptPath)
+		result, err := executeFile(scriptPath)
 		if err != nil {
 			fmt.Fprintf(writer, err.Error())
 		} else {
-			fmt.Fprintf(writer, "OK")
+			fmt.Fprintf(writer, result)
 		}
 	}
 }
 
-func executeFile(scriptPath string) error {
+func executeFile(scriptPath string) (string, error) {
 	cmd := exec.Command("/bin/sh", scriptPath)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
 
-	return cmd.Run()
+	return out.String(), err
 }
 
 func validatePath(path string) error {
